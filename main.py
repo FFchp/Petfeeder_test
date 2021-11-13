@@ -191,4 +191,4 @@ api.add_resource(add_weight, '/add')
 
 # run debug
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(debug = True, host ='0.0.0.0')

@@ -1,0 +1,2 @@
+sudo kill -9 $(sudo lsof -t -i:<port>)	- kill port when you aren't root
+kill -9 $(lsof -t -i:<port>)	      	- kill port when you are root
