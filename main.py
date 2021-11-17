@@ -22,7 +22,7 @@ class Usermodel(db.Model):
     password = db.Column(db.String(100))
     email = db.Column(db.String(100))
     #def __repr__(self):
-    #    return f"uesr(username = {username}, password = {password}, email = {email})"
+    #    return f"Usermodel(username = {username}, password = {password}, email = {email})"
 
 class information_(db.Model):
     __tablename__ = 'information'
@@ -31,7 +31,7 @@ class information_(db.Model):
     info = db.Column(db.Text)
     time = db.Column(db.DateTime)
     def __repr__(self):
-        return f"uesr(no = {information_.no}, topic = {information_.topic}, info = {information_.info}, time = {information_.time})"
+        return f"information(no = {information_.no}, topic = {information_.topic}, info = {information_.info}, time = {information_.time})"
 
 class food_brand(db.Model):
     __tablename__ = 'food_brand'
@@ -42,7 +42,7 @@ class food_brand(db.Model):
     info = db.Column(db.Text)
     time = db.Column(db.DateTime)
 
-class rerder(db.Model):
+class info_for_RerDer(db.Model):
     __tablename__ = 'rerder'
     no = db.Column(db.Integer, primary_key = True)
     weight = db.Column(db.Integer)
@@ -50,6 +50,9 @@ class rerder(db.Model):
     year = db.Column(db.Integer)
     meal = db.Column(db.Integer)
     status = db.Column(db.String(50))
+    def __repr__(self):
+        return f"info_for_RerDer(no = {info_for_RerDer.no}, weight = {info_for_RerDer.weight}, month = {info_for_RerDer.month}, year = {info_for_RerDer.year}, meal = {info_for_RerDer.meal}, status = {info_for_RerDer.status})"
+
 
 db.create_all()
 
@@ -73,14 +76,18 @@ Resource_field={
     'email' : fields.String
 }
 
+class Home(Resource):
+    def get(self):
+        return {'msg':'Hello Flask API'}
+
 class rerDer(Resource):
-    def get(self, no):
-        result = rerder.query.filter_by(no = no).first()
+    def post(self, no):
+        result = info_for_RerDer.query.filter_by(no = no).first()
         #print(result)
         #print(type(result))
         result_ = {"msg" : "404 Error"}
         #print(type(result_))
-        
+
         # Rer Calculate
         rer = 0
         if result.weight >= 12 and result.weight <= 24 : # Send to DB
@@ -111,7 +118,7 @@ class rerDer(Resource):
                 result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
             elif (result.status == 'weight loss') : # Der weight loss
                 derN = 1.0 * rer
-                print("You choose WEIGHT LOSS")   
+                print("You choose WEIGHT LOSS")
                 print("DER per day : ", derN , "kcal/day")
                 eat = derN / result.meal
                 result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
@@ -124,16 +131,14 @@ class rerDer(Resource):
         return result_
 
 class add_weight(Resource):
-    def post(self):
-        args = information_add_args.parse_args()
-        argsdb = rerder(weight = args['weight'], month = args['month'], year = args['year'], meal = args['meal'], status = args['status'])
+    def post(self, weight, month, year, meal, status):
+        #args = information_add_args.parse_args()
+        #argsdb = rerder(weight = args['weight'], month = args['month'], year = args['year'], meal = args['meal'], status = args['status'])
+        argsdb = info_for_RerDer(weight = weight, month = month, year = year, meal = meal, status = status)
+        info = {"weight" : argsdb.weight, "month" : argsdb.month, "year" : argsdb.year, "meal" : argsdb.meal, "status" : argsdb.status}
         db.session.add(argsdb)
         db.session.commit()
-        return args, 201
-
-class Home(Resource):
-    def get(self):
-        return {'msg':'Hello Flask API'}
+        return info, 201
 
 class User(Resource):
     @marshal_with(Resource_field)
@@ -142,15 +147,19 @@ class User(Resource):
         print(result)
         print(type(result))
         return result, 200
-    def post(self):
+
+class add_user(Resource):
+    def post(self, username, password, email):
         args = user_add_args.parse_args()
-        result = Usermodel.query.filter_by(username = args['username']).first()
+        result = Usermodel.query.filter_by(username = username).first()
         if result:
             abort(409, message = 'Username ซ้ำ')
-        user = Usermodel(username = args['username'], password = args['password'], email = args['email'])
-        db.session.add(user)
-        db.session.commit()
-        return args, 201
+        else:
+            user = Usermodel(username = username, password = password, email = email)
+            db.session.add(user)
+            db.session.commit()
+            dict(user)
+            return user, 201
 
 class information(Resource):
     def get(Resource, topic):
@@ -161,15 +170,18 @@ class information(Resource):
         return result_
 
 class get_user(Resource):
-    def get(self, username):
+    def get(self, username, password):
         result = Usermodel.query.filter_by(username = username).first()
         print(result)
         print(type(result))
         if not result:
             abort(404, message = 'ไม่พบ username ที่ร้องขอ')
         else:
-            result_ = {"username" : username, "password" : result.password, "email" : result.email}
-        return result_, 200
+            if result.password == password:
+                result_ = {"username" : username, "password" : result.password, "email" : result.email}
+                return result_, 200
+            else:
+                abort(404, message = 'wrong password')
 
 class brand(Resource):
     def get(self, name):
@@ -180,14 +192,24 @@ class brand(Resource):
             result_ = {"name" : name, "age" : result.age, "favor" : result.Favor, "info" : result.info}
         return result_
 
+class info_rerder(Resource):
+    def get(self):
+        result = info_for_RerDer.query.order_by(info_for_RerDer.no).all()
+        print(result)
+        print(type(result))
+        return result, 200
+        #return 200
+
 # call
 api.add_resource(Home, '/')
 api.add_resource(User, '/user')
-api.add_resource(get_user, '/get_user/<string:username>')
+api.add_resource(add_user, '/add_user/<string:username>/<string:password>/<string:email>')
+api.add_resource(get_user, '/get_user/<string:username>/<string:password>')
 api.add_resource(information, '/info/<string:topic>')
 api.add_resource(brand, '/brand/<string:name>')
 api.add_resource(rerDer, '/rerder/<int:no>')
-api.add_resource(add_weight, '/add')
+api.add_resource(add_weight, '/add/<int:weight>/<int:month>/<int:year>/<int:meal>/<string:status>')
+api.add_resource(info_rerder, '/get_rerder')
 
 # run debug
 if __name__ == '__main__':
