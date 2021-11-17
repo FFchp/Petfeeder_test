@@ -1,4 +1,5 @@
 #flask
+import re
 from flask import Flask
 from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields
 from flask_sqlalchemy import SQLAlchemy
@@ -150,7 +151,6 @@ class User(Resource):
 
 class add_user(Resource):
     def post(self, username, password, email):
-        args = user_add_args.parse_args()
         result = Usermodel.query.filter_by(username = username).first()
         if result:
             abort(409, message = 'Username ซ้ำ')
@@ -197,8 +197,22 @@ class info_rerder(Resource):
         result = info_for_RerDer.query.order_by(info_for_RerDer.no).all()
         print(result)
         print(type(result))
-        return result, 200
-        #return 200
+        #for i in result:
+        #    print(result.no, result.weight, result.month)
+        #return result, 200
+        #result = info_for_RerDer.query.order_by(info_for_RerDer.no).first()
+        #print(result)
+        #print(type(result))
+        #return result, 200
+        ##return 200
+
+class byid_rerder(Resource):
+    def get(self, id):
+        result = info_for_RerDer.query.filter_by(no = id).first()
+        print(result)
+        print(type(result))
+        result_ = {"no" : result.no, "weight" : result.weight, "month" : result.month, "year" : result.year, "meal" : result.meal, "status" : result.status}
+        return result_, 200
 
 # call
 api.add_resource(Home, '/')
@@ -210,7 +224,7 @@ api.add_resource(brand, '/brand/<string:name>')
 api.add_resource(rerDer, '/rerder/<int:no>')
 api.add_resource(add_weight, '/add/<int:weight>/<int:month>/<int:year>/<int:meal>/<string:status>')
 api.add_resource(info_rerder, '/get_rerder')
-
+api.add_resource(byid_rerder, '/byid_rerder/<int:id>')
 # run debug
 if __name__ == '__main__':
     app.run(debug = True, host ='0.0.0.0')
