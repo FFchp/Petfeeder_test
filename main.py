@@ -50,8 +50,8 @@ class info_for_RerDer(db.Model):
     year = db.Column(db.Integer)
     meal = db.Column(db.Integer)
     status = db.Column(db.String(50))
-    def __repr__(self):
-        return f"info_for_RerDer(no = {info_for_RerDer.no}, weight = {info_for_RerDer.weight}, month = {info_for_RerDer.month}, year = {info_for_RerDer.year}, meal = {info_for_RerDer.meal}, status = {info_for_RerDer.status})"
+    #def __repr__(self):
+    #   return f"info_for_RerDer(no = {info_for_RerDer.no}, weight = {info_for_RerDer.weight}, month = {info_for_RerDer.month}, year = {info_for_RerDer.year}, meal = {info_for_RerDer.meal}, status = {info_for_RerDer.status})"
 
 
 db.create_all()
