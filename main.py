@@ -212,7 +212,6 @@ class User(Resource):
 class byid_rerder(Resource):
     @marshal_with(filter_)
     def get(self, id):
-        #result = info_for_RerDer.query.filter_by(no = id).first()
         result = info_for_RerDer.query.filter_by(no = id).all()
         print(result)
         print(type(result))
