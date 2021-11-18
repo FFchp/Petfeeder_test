@@ -199,14 +199,7 @@ class info_rerder(Resource):
         result = info_for_RerDer.query.order_by(info_for_RerDer.no).all()
         print(result)
         print(type(result))
-        #for i in result:
-        #    print(result.no, result.weight, result.month)
-        #return result, 200
-        #result = info_for_RerDer.query.order_by(info_for_RerDer.no).first()
-        #print(result)
-        #print(type(result))
         return result, 200
-        #return 200
 
 class User(Resource):
     @marshal_with(Resource_field)
@@ -223,7 +216,6 @@ class byid_rerder(Resource):
         result = info_for_RerDer.query.filter_by(no = id).all()
         print(result)
         print(type(result))
-        #result_ = {"no" : result.no, "weight" : result.weight, "month" : result.month, "year" : result.year, "meal" : result.meal, "status" : result.status}
         return result, 200
 
 # call
