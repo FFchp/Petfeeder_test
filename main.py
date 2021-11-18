@@ -78,11 +78,11 @@ Resource_field={
 }
 
 filter_ = {
-    'no' : fields.Ineger,
-    'wieght' : fields.Ineger,
-    'month' : fields.Ineger,
-    'year' : fields.Ineger,
-    'meal' : fields.Ineger,
+    'no' : fields.Integer,
+    'wieght' : fields.Integer,
+    'month' : fields.Integer,
+    'year' : fields.Integer,
+    'meal' : fields.Integer,
     'status' : fields.String
 }
 
@@ -194,6 +194,7 @@ class brand(Resource):
         return result_
 
 class info_rerder(Resource):
+    @marshal_with(filter_)
     def get(self):
         result = info_for_RerDer.query.order_by(info_for_RerDer.no).all()
         print(result)
@@ -204,8 +205,8 @@ class info_rerder(Resource):
         #result = info_for_RerDer.query.order_by(info_for_RerDer.no).first()
         #print(result)
         #print(type(result))
-        #return result, 200
-        ##return 200
+        return result, 200
+        #return 200
 
 class User(Resource):
     @marshal_with(Resource_field)
@@ -223,7 +224,7 @@ class byid_rerder(Resource):
         print(result)
         print(type(result))
         #result_ = {"no" : result.no, "weight" : result.weight, "month" : result.month, "year" : result.year, "meal" : result.meal, "status" : result.status}
-        return result_, 200
+        return result, 200
 
 # call
 api.add_resource(Home, '/')
