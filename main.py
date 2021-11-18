@@ -77,12 +77,21 @@ Resource_field={
     'email' : fields.String
 }
 
+filter_ = {
+    'no' : fields.Ineger,
+    'wieght' : fields.Ineger,
+    'month' : fields.Ineger,
+    'year' : fields.Ineger,
+    'meal' : fields.Ineger,
+    'status' : fields.String
+}
+
 class Home(Resource):
     def get(self):
         return {'msg':'Hello Flask API'}
 
 class rerDer(Resource):
-    def post(self, no):
+    def get(self, no):
         result = info_for_RerDer.query.filter_by(no = no).first()
         #print(result)
         #print(type(result))
@@ -141,14 +150,6 @@ class add_weight(Resource):
         db.session.commit()
         return info, 201
 
-class User(Resource):
-    @marshal_with(Resource_field)
-    def get(self):
-        result = Usermodel.query.order_by(Usermodel.no).all()
-        print(result)
-        print(type(result))
-        return result, 200
-
 class add_user(Resource):
     def post(self, username, password, email):
         result = Usermodel.query.filter_by(username = username).first()
@@ -206,12 +207,22 @@ class info_rerder(Resource):
         #return result, 200
         ##return 200
 
-class byid_rerder(Resource):
-    def get(self, id):
-        result = info_for_RerDer.query.filter_by(no = id).first()
+class User(Resource):
+    @marshal_with(Resource_field)
+    def get(self):
+        result = Usermodel.query.order_by(Usermodel.no).all()
         print(result)
         print(type(result))
-        result_ = {"no" : result.no, "weight" : result.weight, "month" : result.month, "year" : result.year, "meal" : result.meal, "status" : result.status}
+        return result, 200
+
+class byid_rerder(Resource):
+    @marshal_with(filter_)
+    def get(self, id):
+        #result = info_for_RerDer.query.filter_by(no = id).first()
+        result = info_for_RerDer.query.filter_by(no = id).all()
+        print(result)
+        print(type(result))
+        #result_ = {"no" : result.no, "weight" : result.weight, "month" : result.month, "year" : result.year, "meal" : result.meal, "status" : result.status}
         return result_, 200
 
 # call
