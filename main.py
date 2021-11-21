@@ -1,9 +1,8 @@
 #flask
 import re
 from flask import Flask
-from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields
+from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields, auth
 from flask_sqlalchemy import SQLAlchemy
-
 # create Flask
 app = Flask(__name__)
 
@@ -22,8 +21,6 @@ class Usermodel(db.Model):
     username = db.Column(db.String(100))
     password = db.Column(db.String(100))
     email = db.Column(db.String(100))
-    #def __repr__(self):
-    #    return f"Usermodel(username = {username}, password = {password}, email = {email})"
 
 class information_(db.Model):
     __tablename__ = 'information'
@@ -51,11 +48,23 @@ class info_for_RerDer(db.Model):
     year = db.Column(db.Integer)
     meal = db.Column(db.Integer)
     status = db.Column(db.String(50))
-    #def __repr__(self):
-    #   return f"info_for_RerDer(no = {info_for_RerDer.no}, weight = {info_for_RerDer.weight}, month = {info_for_RerDer.month}, year = {info_for_RerDer.year}, meal = {info_for_RerDer.meal}, status = {info_for_RerDer.status})"
+    
 
+class calories(db.Model):
+    __tablename__ = 'calorie'
+    no = db.Column(db.Integer, primary_key = True)
+    time = db.Column(db.DateTime)
+    cal = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('Usermodel.no'))
 
-db.create_all()
+class waters(db.Model):
+    __tablename__ = 'waters'
+    no = db.Column(db.Integer, primary_key = True)
+    timestamp = db.Column(db.DateTime)
+    vol = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('Usermodel.no'))
+
+#db.create_all()
 
 # Request Parser
 user_add_args = reqparse.RequestParser()
@@ -70,20 +79,34 @@ information_add_args.add_argument('year', type = int, required = True, help = '�
 information_add_args.add_argument('meal', type = int, required = True, help = 'กรุณาใส่ meal')
 information_add_args.add_argument('status', type = str, required = True, help = 'กรุณาใส่ status')
 
-Resource_field={
+Resource_field_usermodel = {
     'no' : fields.Integer,
     'username' : fields.String,
     'password' : fields.String,
     'email' : fields.String
 }
 
-filter_ = {
+Resource_field_rerder = {
     'no' : fields.Integer,
     'wieght' : fields.Integer,
     'month' : fields.Integer,
     'year' : fields.Integer,
     'meal' : fields.Integer,
     'status' : fields.String
+}
+
+Resource_field_calorie = {
+    'no' : fields.Integer,
+    'time' : fields.DateTime(dt_format='rfc822'),
+    'cal' : fields.Integer,
+    'user_id' : fields.Integer
+}
+
+Resource_field_water = {
+    'no' : fields.Integer,
+    'timestamp' : fields.DateTime(dt_format='rfc822'),
+    'vol' : fields.Integer,
+    'user_id' : fields.Integer
 }
 
 class Home(Resource):
@@ -101,7 +124,7 @@ class rerDer(Resource):
         # Rer Calculate
         rer = 0
         if result.weight >= 12 and result.weight <= 24 : # Send to DB
-            rer = (30 * result.weight) + 70 
+            rer = (30 * result.weight) + 70
             print("Your dog need " , rer , "kcal per day")
         else : # Send to DB
             rer2 = result.weight ** 0.75
@@ -179,8 +202,9 @@ class get_user(Resource):
             abort(404, message = 'ไม่พบ username ที่ร้องขอ')
         else:
             if result.password == password:
-                result_ = {"username" : username, "password" : result.password, "email" : result.email}
-                return result_, 200
+                #result_ = {"username" : username, "password" : result.password, "email" : result.email}
+                #return result_, 200
+                return {"msg" : "correct"}, 200
             else:
                 abort(404, message = 'wrong password')
 
@@ -194,7 +218,7 @@ class brand(Resource):
         return result_
 
 class info_rerder(Resource):
-    @marshal_with(filter_)
+    @marshal_with(Resource_field_rerder)
     def get(self):
         result = info_for_RerDer.query.order_by(info_for_RerDer.no).all()
         print(result)
@@ -202,7 +226,7 @@ class info_rerder(Resource):
         return result, 200
 
 class User(Resource):
-    @marshal_with(Resource_field)
+    @marshal_with(Resource_field_usermodel)
     def get(self):
         result = Usermodel.query.order_by(Usermodel.no).all()
         print(result)
@@ -210,24 +234,54 @@ class User(Resource):
         return result, 200
 
 class byid_rerder(Resource):
-    @marshal_with(filter_)
+    @marshal_with(Resource_field_rerder)
     def get(self, id):
         result = info_for_RerDer.query.filter_by(no = id).all()
         print(result)
         print(type(result))
         return result, 200
 
+'''
+class add_img(Resource):
+    #@marshal_with()
+    def post(self, id):
+        pass
+    def update():
+        pass
+'''
+
+class cal(Resource):
+    @marshal_with(Resource_field_calorie)
+    def get(self):
+        result = calories.query.order_by(calories.no).all()
+        print(result)
+        print(type(result))
+        return result, 200
+
+class water(Resource):
+    @marshal_with(Resource_field_water)
+    def get(self):
+        result = waters.query.order_by(waters.no).all()
+        print(result)
+        print(type(result))
+        return result, 200
+
+
 # call
 api.add_resource(Home, '/')
-api.add_resource(User, '/user')
-api.add_resource(add_user, '/add_user/<string:username>/<string:password>/<string:email>')
-api.add_resource(get_user, '/get_user/<string:username>/<string:password>')
+api.add_resource(User, '/user') # get all users
+api.add_resource(add_user, '/add_user/<string:username>/<string:password>/<string:email>')   # register
+api.add_resource(get_user, '/get_user/<string:username>/<string:password>') # log in
 api.add_resource(information, '/info/<string:topic>')
 api.add_resource(brand, '/brand/<string:name>')
 api.add_resource(rerDer, '/rerder/<int:no>')
 api.add_resource(add_weight, '/add/<int:weight>/<int:month>/<int:year>/<int:meal>/<string:status>')
 api.add_resource(info_rerder, '/get_rerder')
 api.add_resource(byid_rerder, '/byid_rerder/<int:id>')
+api.add_resource(cal, '/calories')
+api.add_resource(water, '/water')
+
+
 # run debug
 if __name__ == '__main__':
     app.run(debug = True, host ='0.0.0.0')

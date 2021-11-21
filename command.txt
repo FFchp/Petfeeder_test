@@ -1,6 +1,9 @@
+# kill port
 sudo kill -9 $(sudo lsof -t -i:<port>)	- kill port when you aren't root
 kill -9 $(lsof -t -i:<port>)	      	- kill port when you are root
 
+# delete File or Directory
 rm <file_name>				- Remove File 
 rm -r <directory>			- Remove emtry directory
 rm -rf <directory>			- Remove non-emtry directory
+rm -R <directory>
