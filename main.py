@@ -1,7 +1,7 @@
 #flask
 import re
 from flask import Flask
-from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields, auth
+from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields
 from flask_sqlalchemy import SQLAlchemy
 # create Flask
 app = Flask(__name__)
