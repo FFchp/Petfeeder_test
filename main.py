@@ -54,7 +54,7 @@ class calories(db.Model):
     __tablename__ = 'calorie'
     no = db.Column(db.Integer, primary_key = True)
     time = db.Column(db.DateTime)
-    cal = db.Column(db.Integer)
+    vol = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('Usermodel.no'))
 
 class waters(db.Model):
