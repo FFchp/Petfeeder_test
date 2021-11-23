@@ -45,9 +45,9 @@ class food_brand(db.Model):
 
 class water(db.Model):
     __tablename__ = 'water'
-    wt_no = db.Column(db.Integer, primary_key = True)
-    wt_time = db.Column(db.DateTime)
-    wt_quantity = db.Column(db.Integer)
+    WT_NO = db.Column(db.Integer, primary_key = True)
+    WT_TIME = db.Column(db.DateTime)
+    WT_QUANTITY = db.Column(db.Integer)
     MEM_ID = db.Column(db.Integer, primary_key = True)
 
 class Status(db.Model):
@@ -58,7 +58,7 @@ class Status(db.Model):
 
 class cal_rerder(db.Model):
     __tablename__ = 'cal_rerder'
-    no = db.Column(db.Integer, primary_key = True)
+    No = db.Column(db.Integer, primary_key = True)
     rer = db.Column(db.Integer)
     der = db.Column(db.Integer)
     timestamp = db.Column(db.DateTime)
@@ -84,7 +84,7 @@ class food(db.Model):
 
 class calorie(db.Model):
     __tablename__ = 'calorie'
-    no = db.Column(db.Integer, primary_key = True)
+    No = db.Column(db.Integer, primary_key = True)
     time = db.Column(db.DateTime)
     vol = db.Column(db.Integer)
     MEM_ID = db.Column(db.Integer, db.ForeignKey('user.MEM_ID'))
@@ -93,7 +93,7 @@ db.create_all() # create all table
 
 # resource field
 Resource_field_usermodel = {
-    'no' : fields.Integer,
+    'MEM_ID' : fields.Integer,
     'username' : fields.String,
     'password' : fields.String,
     'email' : fields.String
@@ -120,9 +120,9 @@ Resource_field_brand = {
 }
 
 Resource_field_water = {
-    'wt_no' : fields.Integer,
-    'wt_time' : fields.DateTime(dt_format='rfc822'),
-    'wt_quantity' : fields.Integer,
+    'WT_NO' : fields.Integer,
+    'WT_TIME' : fields.DateTime(dt_format='rfc822'),
+    'WT_QUANTITY' : fields.Integer,
     'MEM_ID' : fields.Integer
 }
 Resource_field_info = {
@@ -399,16 +399,20 @@ api.add_resource(add_user, '/add_user')             # register
 api.add_resource(login, '/login')                   # login
 api.add_resource(brand, '/brand')                   # food_brand
 api.add_resource(informations, '/information')      # get information
-api.add_resource(waters, '/water')                  # query all water
-api.add_resource(water_id, '/water_id')             # get waters by id id
 api.add_resource(Calculate, '/calculate')           # calulate
 api.add_resource(weight, '/add_weight')             # add dog personal info
 api.add_resource(get_rer_byid, '/rer_byid')         # get rer der by id
 api.add_resource(calories, '/calories')             # get cal by id
 api.add_resource(foods, '/food')                    # get food by id
+api.add_resource(waters, '/water')                  # query all water
+api.add_resource(water_id, '/water_id')             # get waters by id
 
 
 # run_debug
 if __name__ == '__main__':
     app.run(debug = True, host ='0.0.0.0')
 
+"""
+    data -> {id : 1}
+    data.id -> 1
+"""
