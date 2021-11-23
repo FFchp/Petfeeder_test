@@ -314,7 +314,7 @@ api.add_resource(Home, '/')     # home
 api.add_resource(User, '/user') # get all users
 #api.add_resource(add_user, '/add_user/<string:username>/<string:password>/<string:email>')   # register
 api.add_resource(add_user, '/add_user')
-api.add_resource(get_user, '/get_user/<string:username>/<string:password>') # log in
+api.add_resource(get_user, '/login') #log in
 api.add_resource(information, '/info/<string:topic>') # information
 api.add_resource(brand, '/brand/<string:name>')       # show brand
 api.add_resource(rerDer, '/rerder/<int:no>')          # rerDer
