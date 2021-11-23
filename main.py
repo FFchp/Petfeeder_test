@@ -81,6 +81,11 @@ user_add_args.add_argument('username', type = str, required = True, help='กร
 user_add_args.add_argument('password', type = str, required = True, help='กรุณาใส่ Password')
 user_add_args.add_argument('email', type = str, required = True, help='กรุณาใส่ Email')
 
+# login
+login_add_args = reqparse.RequestParser()
+login_add_args.add_argument('username', type = str, required = True, help='กรุณาใส่ Username')
+login_add_args.add_argument('password', type = str, required = True, help='กรุณาใส่ Password')
+
 information_add_args = reqparse.RequestParser()
 information_add_args.add_argument('weight', type = int, required = True, help = 'กรุณาใส่ weight')
 information_add_args.add_argument('month', type = int, required = True, help = 'กรุณาใส่ month')
@@ -236,7 +241,7 @@ class information(Resource):
 
 class get_user(Resource):
     def get(self):
-        args = user_add_args.parse_args()
+        args = login_add_args.parse_args()
         password = args['password']
         result = Usermodel.query.filter_by(username = args['username']).first()
         print(result)
