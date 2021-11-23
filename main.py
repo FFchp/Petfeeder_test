@@ -48,7 +48,6 @@ class info_for_RerDer(db.Model):
     year = db.Column(db.Integer)
     meal = db.Column(db.Integer)
     status = db.Column(db.String(50))
-    
 
 class calories(db.Model):
     __tablename__ = 'calorie'
@@ -64,7 +63,17 @@ class waters(db.Model):
     vol = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('Usermodel.no'))
 
-#db.create_all()
+class record_rerder(db.Model):
+    __tablename__ = 'record_rerder'
+    no = db.Column(db.Integer, primary_key = True)
+    rer = db.Column(db.Integer)
+    der = db.Column(db.Integer)
+    timestamp = db.Column(db.DateTime)
+    eat = db.Column(db.Integer)
+    rerder_id = db.Column(db.Integer)
+    mem_id = db.Column(db.Integer)
+
+db.create_all()
 
 # Request Parser
 user_add_args = reqparse.RequestParser()
@@ -109,18 +118,29 @@ Resource_field_water = {
     'user_id' : fields.Integer
 }
 
+Resource_field_rerder = {
+    'no' : fields.Integer,
+    'weight' : fields.Integer,
+    'month' : fields.Integer,
+    'year' : fields.Integer,
+    'meal': fields.Integer,
+    'status' : fields.String
+}
+
 class Home(Resource):
     def get(self):
         return {'msg':'Hello Flask API'}
 
 class rerDer(Resource):
+    #@marshal_with(Resource_field_rerder)
     def get(self, no):
-        result = info_for_RerDer.query.filter_by(no = no).first()
+        result = info_for_RerDer.query.filter_by(no = no).order_by(info_for_RerDer.no.desc()).first()
         #print(result)
         #print(type(result))
-        result_ = {"msg" : "404 Error"}
+        if not result:
+            abort(404, message = "Don't found value")
         #print(type(result_))
-
+        #return result
         # Rer Calculate
         rer = 0
         if result.weight >= 12 and result.weight <= 24 : # Send to DB
@@ -130,7 +150,7 @@ class rerDer(Resource):
             rer2 = result.weight ** 0.75
             rer = rer2 * 70
             print("Your dog need " , rer , "kcal per day")
-        
+
         # Der Calculate
         derN = 0
         if result.year == 0 and result.month <= 4 : # Der
@@ -142,26 +162,44 @@ class rerDer(Resource):
                 print("You choose NEUTERED") 
                 print("DER per day : ", derN , "kcal/day")
                 eat = derN / result.meal
-                result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
+                #result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
+                result_ = record_rerder(rer = rer, der = derN, eat = eat, rerder_id = no, mem_id = no)
+                show = {"rer" : rer, "der" : derN, "eat" : eat, "rerder_id" : no, "mem_id" : no}
+                #return show, 200
+
             elif (result.status == 'obese') : # Der obese
                 derN = 1.4 * rer
                 print("You choose OBESE PRONE")    
                 print("DER per day : ", derN , "kcal/day")
                 eat = derN / result.meal
-                result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
+                #result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
+                result_ = record_rerder(rer = rer, der = derN, eat = eat, rerder_id = no, mem_id = no)
+                show = {"rer" : rer, "der" : derN, "eat" : eat, "rerder_id" : no, "mem_id" : no}
+                #return show, 200
+
             elif (result.status == 'weight loss') : # Der weight loss
                 derN = 1.0 * rer
                 print("You choose WEIGHT LOSS")
                 print("DER per day : ", derN , "kcal/day")
                 eat = derN / result.meal
-                result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
+                #result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
+                result_ = record_rerder(rer = rer, der = derN, eat = eat, rerder_id = no, mem_id = no)
+                show = {"rer" : rer, "der" : derN, "eat" : eat, "rerder_id" : no, "mem_id" : no}
+                #return show, 200
+
             elif (result.status == 'normal') : # Der Normal
                 derN = 2 * rer
                 print("You choose SET NORMAL")
                 print("DER per day : ", derN , "kcal/day")
                 eat = derN / result.meal
-                result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}    
-        return result_
+                #result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}    
+                result_ = record_rerder(rer = rer, der = derN, eat = eat, rerder_id = no, mem_id = no)
+                show = {"rer" : rer, "der" : derN, "eat" : eat, "rerder_id" : no, "mem_id" : no}
+                #return show, 200
+
+        db.session.add(result_)
+        db.session.commit()
+        return show, 200
 
 class add_weight(Resource):
     def post(self, weight, month, year, meal, status):
@@ -174,16 +212,19 @@ class add_weight(Resource):
         return info, 201
 
 class add_user(Resource):
-    def post(self, username, password, email):
-        result = Usermodel.query.filter_by(username = username).first()
+    @marshal_with(Resource_field_usermodel)
+    #def post(self, username, password, email):
+    def post(self):
+        args = user_add_args.parse_args()
+        argsdb = Usermodel(username = args['username'], password = args['password'], email = args['email'])
+        result = Usermodel.query.filter_by(username = args['username']).first()
         if result:
             abort(409, message = 'Username ซ้ำ')
         else:
-            user = Usermodel(username = username, password = password, email = email)
-            db.session.add(user)
+            #user = Usermodel(username = username, password = password, email = email)
+            db.session.add(argsdb)
             db.session.commit()
-            dict(user)
-            return user, 201
+            return argsdb, 201
 
 class information(Resource):
     def get(Resource, topic):
@@ -205,8 +246,10 @@ class get_user(Resource):
                 #result_ = {"username" : username, "password" : result.password, "email" : result.email}
                 #return result_, 200
                 return {"msg" : "correct"}, 200
+                #return dict(ret = 0, msg = "correct"), 200
             else:
                 abort(404, message = 'wrong password')
+                #return dict(ret = -1, msg = "wrong"), 404
 
 class brand(Resource):
     def get(self, name):
@@ -266,20 +309,20 @@ class water(Resource):
         print(type(result))
         return result, 200
 
-
 # call
-api.add_resource(Home, '/')
+api.add_resource(Home, '/')     # home
 api.add_resource(User, '/user') # get all users
-api.add_resource(add_user, '/add_user/<string:username>/<string:password>/<string:email>')   # register
+#api.add_resource(add_user, '/add_user/<string:username>/<string:password>/<string:email>')   # register
+api.add_resource(add_user, '/add_user')
 api.add_resource(get_user, '/get_user/<string:username>/<string:password>') # log in
-api.add_resource(information, '/info/<string:topic>')
-api.add_resource(brand, '/brand/<string:name>')
-api.add_resource(rerDer, '/rerder/<int:no>')
-api.add_resource(add_weight, '/add/<int:weight>/<int:month>/<int:year>/<int:meal>/<string:status>')
-api.add_resource(info_rerder, '/get_rerder')
-api.add_resource(byid_rerder, '/byid_rerder/<int:id>')
-api.add_resource(cal, '/calories')
-api.add_resource(water, '/water')
+api.add_resource(information, '/info/<string:topic>') # information
+api.add_resource(brand, '/brand/<string:name>')       # show brand
+api.add_resource(rerDer, '/rerder/<int:no>')          # rerDer
+api.add_resource(add_weight, '/add/<int:weight>/<int:month>/<int:year>/<int:meal>/<string:status>') #add weight
+api.add_resource(info_rerder, '/get_rerder')           # get all rer, der value
+api.add_resource(byid_rerder, '/byid_rerder/<int:id>') # get all rer, der by id 
+api.add_resource(cal, '/calories')                     # get cal  
+api.add_resource(water, '/water')                      # get water
 
 
 # run debug
