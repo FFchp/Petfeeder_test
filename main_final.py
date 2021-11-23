@@ -5,7 +5,7 @@ from flask.scaffold import _matching_loader_thinks_module_is_package
 from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields
 from flask_sqlalchemy import SQLAlchemy
 
-from main import Resource_field_rerder
+from main import Resource_field_rerder, cal
 # create Flask
 app = Flask(__name__)
 
@@ -58,7 +58,7 @@ class Status(db.Model):
 
 class cal_rerder(db.Model):
     __tablename__ = 'cal_rerder'
-    No = db.Column(db.Integer, primary_key = True)
+    no = db.Column(db.Integer, primary_key = True)
     rer = db.Column(db.Integer)
     der = db.Column(db.Integer)
     timestamp = db.Column(db.DateTime)
@@ -132,6 +132,14 @@ Resource_field_info = {
     'time' : fields.DateTime(dt_format='rfc822')
 }
 
+Resource_field_calrerder = {
+    'no' : fields.Integer,
+    'rer' : fields.Integer,
+    'der' : fields.Integer,
+    'timestamp' : fields.DateTime,
+    'rerder_id' : fields.Integer
+}
+
 # Request Parser
 #register
 user_add_args = reqparse.RequestParser()
@@ -169,6 +177,15 @@ info_add_args.add_argument('topic', type = str, required = True, help = 'ใส�
 # rerder
 rerder_add_args = reqparse.RequestParser()
 rerder_add_args.add_argument('rerder_id', type = int)
+
+# rerder
+no_add_args = reqparse.RequestParser()
+no_add_args.add_argument('no', type = int)
+
+# calories
+calorie_add_args = reqparse.RequestParser()
+calorie_add_args.add_argument('MEM_ID', type)
+
 '''
 rerder_add_args.add_argument('weight', type = int)
 rerder_add_args.add_argument('month', type = int)
@@ -211,12 +228,12 @@ class login(Resource):
         else:
             if  result.password == password:
                 print(password, ' ', result.password)
-                msg = {"msg" : "correct"}
+                msg = {"id" : result.MEM_ID}
                 return msg, 200
             else:
                 abort(400, message = 'Wrong Username or Password')
 
-#add weight
+# add weight
 class weight(Resource):
     def post(self):
         args = weight_add_args.parse_args()
@@ -336,20 +353,31 @@ class Calculate(Resource):
         db.session.commit()
         return show, 200
 
-#class get_rerder_byid(Resource):
-    #args = rerder_add_args.parse_args()
-    #result = rer
+class get_rer_byid(Resource):
+    @marshal_with(Resource_field_calrerder)
+    def get(self):
+        args = no_add_args.parse_args()
+        result = cal_rerder.query.filter_by(no = args['no']).all()
+        return result, 200
+
+class calories(Resource):
+    def get(self):
+        args = calorie_add_args.parse_args()
+        result = calorie.query.filter_by(MEM_ID = args['MEM_ID']).all()
+        return result, 200
 
 # Call api
 api.add_resource(Home, '/')
-api.add_resource(add_user, '/add_user') # register
-api.add_resource(login, '/login')       # login
-api.add_resource(brand, '/brand')       # food_brand
-api.add_resource(waters, '/water')      # query water
-api.add_resource(water_id, '/water_id') # get waters id
-api.add_resource(informations, '/information') # get information
-api.add_resource(Calculate, '/calculate')      # calulate
-api.add_resource(weight, '/add_weight')        # add dog personal info
+api.add_resource(add_user, '/add_user')             # register
+api.add_resource(login, '/login')                   # login
+api.add_resource(brand, '/brand')                   # food_brand
+api.add_resource(informations, '/information')      # get information
+api.add_resource(waters, '/water')                  # query all water
+api.add_resource(water_id, '/water_id')             # get waters by id id
+api.add_resource(Calculate, '/calculate')           # calulate
+api.add_resource(weight, '/add_weight')             # add dog personal info
+api.add_resource(get_rer_byid, '/rer_byid')         # get rer der by id
+api.add_resource(calories, '/calories')              # get cal by id
 
 
 # run_debug
