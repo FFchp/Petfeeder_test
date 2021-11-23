@@ -202,10 +202,10 @@ class rerDer(Resource):
         return show, 200
 
 class add_weight(Resource):
-    def post(self, weight, month, year, meal, status):
-        #args = information_add_args.parse_args()
-        #argsdb = rerder(weight = args['weight'], month = args['month'], year = args['year'], meal = args['meal'], status = args['status'])
-        argsdb = info_for_RerDer(weight = weight, month = month, year = year, meal = meal, status = status)
+    def post(self):
+        args = information_add_args.parse_args()
+        argsdb = info_for_RerDer(weight = args['weight'], month = args['month'], year = args['year'], meal = args['meal'], status = args['status'])
+        #argsdb = info_for_RerDer(weight = weight, month = month, year = year, meal = meal, status = status)
         info = {"weight" : argsdb.weight, "month" : argsdb.month, "year" : argsdb.year, "meal" : argsdb.meal, "status" : argsdb.status}
         db.session.add(argsdb)
         db.session.commit()
