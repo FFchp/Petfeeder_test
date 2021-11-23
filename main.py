@@ -240,7 +240,7 @@ class information(Resource):
         return result_
 
 class get_user(Resource):
-    def get(self):
+    def post(self):
         args = login_add_args.parse_args()
         password = args['password']
         result = Usermodel.query.filter_by(username = args['username']).first()
