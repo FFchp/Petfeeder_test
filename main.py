@@ -235,21 +235,21 @@ class information(Resource):
         return result_
 
 class get_user(Resource):
-    def get(self, username, password):
-        result = Usermodel.query.filter_by(username = username).first()
+    def get(self):
+        args = user_add_args.parse_args()
+        password = args['password']
+        result = Usermodel.query.filter_by(username = args['username']).first()
         print(result)
         print(type(result))
         if not result:
-            abort(404, message = 'ไม่พบ username ที่ร้องขอ')
+            abort(404, message = 'Wrong Username or Password')
         else:
-            if result.password == password:
-                #result_ = {"username" : username, "password" : result.password, "email" : result.email}
-                #return result_, 200
-                return {"msg" : "correct"}, 200
-                #return dict(ret = 0, msg = "correct"), 200
+            if  result.password == password:
+                print(password, ' ', result.password)
+                msg = {"msg" : "correct"}
+                return msg, 200
             else:
-                abort(404, message = 'wrong password')
-                #return dict(ret = -1, msg = "wrong"), 404
+                abort(400, message = 'Wrong Username or Password')
 
 class brand(Resource):
     def get(self, name):
