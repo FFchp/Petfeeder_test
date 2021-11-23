@@ -338,7 +338,7 @@ class Calculate(Resource):
 
 class get_rerder_byid(Resource):
     args = rerder_add_args.parse_args()
-    result = rer
+    #result = rer
 
 # Call api
 api.add_resource(Home, '/')
