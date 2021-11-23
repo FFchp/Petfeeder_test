@@ -318,7 +318,7 @@ api.add_resource(get_user, '/get_user/<string:username>/<string:password>') # lo
 api.add_resource(information, '/info/<string:topic>') # information
 api.add_resource(brand, '/brand/<string:name>')       # show brand
 api.add_resource(rerDer, '/rerder/<int:no>')          # rerDer
-api.add_resource(add_weight, '/add/<int:weight>/<int:month>/<int:year>/<int:meal>/<string:status>') #add weight
+api.add_resource(add_weight, '/add')                 #add weight
 api.add_resource(info_rerder, '/get_rerder')           # get all rer, der value
 api.add_resource(byid_rerder, '/byid_rerder/<int:id>') # get all rer, der by id 
 api.add_resource(cal, '/calories')                     # get cal  
