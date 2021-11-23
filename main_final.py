@@ -336,8 +336,8 @@ class Calculate(Resource):
         db.session.commit()
         return show, 200
 
-class get_rerder_byid(Resource):
-    args = rerder_add_args.parse_args()
+#class get_rerder_byid(Resource):
+    #args = rerder_add_args.parse_args()
     #result = rer
 
 # Call api
