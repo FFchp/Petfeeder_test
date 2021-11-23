@@ -84,7 +84,7 @@ class food(db.Model):
 
 class calorie(db.Model):
     __tablename__ = 'calorie'
-    No = db.Column(db.Integer, primary_key = True)
+    no = db.Column(db.Integer, primary_key = True)
     time = db.Column(db.DateTime)
     vol = db.Column(db.Integer)
     MEM_ID = db.Column(db.Integer, db.ForeignKey('user.MEM_ID'))
@@ -140,6 +140,20 @@ Resource_field_calrerder = {
     'rerder_id' : fields.Integer
 }
 
+Resource_field_calorie = {
+    'no' : fields.Integer,
+    'time' : fields.DateTime(dt_format='rfc822'),
+    'vol' : fields.Integer,
+    'MEM_ID' : fields.Integer
+}
+
+Resource_field_food = {
+    'No' : fields.Integer,
+    'Time' : fields.DateTime(dt_format='rfc822'),
+    'Food' : fields.Integer,
+    'MEM_ID' : fields.Integer
+}
+
 # Request Parser
 #register
 user_add_args = reqparse.RequestParser()
@@ -184,7 +198,12 @@ no_add_args.add_argument('no', type = int)
 
 # calories
 calorie_add_args = reqparse.RequestParser()
-calorie_add_args.add_argument('MEM_ID', type)
+calorie_add_args.add_argument('MEM_ID', type = int)
+
+# food
+food_add_args = reqparse.RequestParser()
+food_add_args.add_argument('MEM_ID', type = int)
+
 
 '''
 rerder_add_args.add_argument('weight', type = int)
@@ -361,9 +380,17 @@ class get_rer_byid(Resource):
         return result, 200
 
 class calories(Resource):
+    @marshal_with(Resource_field_calorie)
     def get(self):
         args = calorie_add_args.parse_args()
         result = calorie.query.filter_by(MEM_ID = args['MEM_ID']).all()
+        return result, 200
+
+class foods(Resource):
+    @marshal_with(Resource_field_food)
+    def get(self):
+        args = food_add_args.parse_args()
+        result = food.query.filter_by(MEM_ID = args['MEM_ID']).all()
         return result, 200
 
 # Call api
@@ -377,7 +404,8 @@ api.add_resource(water_id, '/water_id')             # get waters by id id
 api.add_resource(Calculate, '/calculate')           # calulate
 api.add_resource(weight, '/add_weight')             # add dog personal info
 api.add_resource(get_rer_byid, '/rer_byid')         # get rer der by id
-api.add_resource(calories, '/calories')              # get cal by id
+api.add_resource(calories, '/calories')             # get cal by id
+api.add_resource(foods, '/food')                    # get food by id
 
 
 # run_debug
