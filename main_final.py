@@ -2,7 +2,6 @@
 from flask import Flask
 from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
 
 # create Flask
 app = Flask(__name__)
@@ -153,7 +152,6 @@ Resource_field_graph_cal = {
     'MEM_ID' : fields.Integer
 }
 
-
 # Request Parser
 #register
 user_add_args = reqparse.RequestParser()
@@ -204,16 +202,6 @@ calorie_add_args.add_argument('MEM_ID', type = int)
 food_add_args = reqparse.RequestParser()
 food_add_args.add_argument('MEM_ID', type = int)
 
-
-'''
-rerder_add_args.add_argument('weight', type = int)
-rerder_add_args.add_argument('month', type = int)
-rerder_add_args.add_argument('year', type = int)
-rerder_add_args.add_argument('meal', type = int)
-rerder_add_args.add_argument('status', type = str)
-rerder_add_args.add_argument('MEM_ID', type = int)
-'''
-
 # Design Api
 class Home(Resource):
     def get(self):
@@ -222,7 +210,6 @@ class Home(Resource):
 # Register
 class add_user(Resource):
     @marshal_with(Resource_field_usermodel)
-    #def post(self, username, password, email):
     def post(self):
         args = user_add_args.parse_args()
         argsdb = user(username = args['username'], password = args['password'], email = args['email'])
@@ -238,9 +225,7 @@ class add_user(Resource):
 class login(Resource):
     def post(self):
         args = login_add_args.parse_args()
-        #username = args['username']
         password = args['password']
-        #print(password)
         result = user.query.filter_by(username = args['username']).first()
         print(result)
         if not result:
@@ -258,9 +243,6 @@ class weight(Resource):
     def post(self):
         args = weight_add_args.parse_args()
         argsdb = rerder(dog_name = args['dog_name'] ,weight = args['weight'], month = args['month'], year = args['year'], meal = args['meal'], status = args['status'])
-        #result = rerder.query.filter_by(dog_name = args['dog_name']).first()
-        #if not result:
-        #    abort(400, message = '')
         db.session.add(argsdb)
         db.session.commit()
         return argsdb, 201
@@ -307,12 +289,8 @@ class Calculate(Resource):
         args = rerder_add_args.parse_args()
         result = rerder.query.filter_by(rerder_id = args['rerder_id']).order_by(rerder.rerder_id.desc()).first()
         eat = result.meal
-        #print(result)
-        #print(type(result))
         if not result:
             abort(404, message = "Don't found value")
-        #print(type(result_))
-        #return result
         # Rer Calculate
         rer = 0
         if result.weight >= 12 and result.weight <= 24 : # Send to DB
@@ -334,40 +312,33 @@ class Calculate(Resource):
                 print("You choose NEUTERED") 
                 print("DER per day : ", derN , "kcal/day")
                 eat = derN / result.meal
-                #result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
                 result_ = cal_rerder(rer = rer, der = derN, rerder_id = args['rerder_id'])
                 show = {"rer" : rer, "der" : derN, "meal" : eat, "rerder_id" : args['rerder_id']}
-                #return show, 200
 
             elif (result.status == 'obese') : # Der obese
                 derN = 1.4 * rer
                 print("You choose OBESE PRONE")    
                 print("DER per day : ", derN , "kcal/day")
                 eat = derN / result.meal
-                #result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
                 result_ = cal_rerder(rer = rer, der = derN, rerder_id = args['rerder_id'])
                 show = {"rer" : rer, "der" : derN, "meal" : eat, "rerder_id" : args['rerder_id']}
-                #return show, 200
 
             elif (result.status == 'weight loss') : # Der weight loss
                 derN = 1.0 * rer
                 print("You choose WEIGHT LOSS")
                 print("DER per day : ", derN , "kcal/day")
                 eat = derN / result.meal
-                #result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
                 result_ = cal_rerder(rer = rer, der = derN, rerder_id = args['rerder_id'])
                 show = {"rer" : rer, "der" : derN, "meal" : eat, "rerder_id" : args['rerder_id']}
-                #return show, 200
 
             elif (result.status == 'normal') : # Der Normal
                 derN = 2 * rer
                 print("You choose SET NORMAL")
                 print("DER per day : ", derN , "kcal/day")
                 eat = derN / result.meal
-                #result_ = {"Weight": result.weight, "Month" : result.month, "Year" : result.year, "Status" : result.status, "Rer" : rer, "Der" : derN, "Meals" : result.meal, "CalPerMeal" : eat}
                 result_ = cal_rerder(rer = rer, der = derN, rerder_id = args['rerder_id'])
                 show = {"rer" : rer, "der" : derN, "meal" : eat, "rerder_id" : args['rerder_id']}
-                #return show, 200
+
         # add to database
         db.session.add(result_)
         db.session.commit()
@@ -399,16 +370,16 @@ class graph_7day(Resource):
     def get(self):
         args = food_add_args.parse_args()
         #SELECT SUM(vol), time from calorie group by DATE(time) ORDER BY time desc limit 5
-        #result = calorie.query.func.sum.calorie.vol.group_by(calorie.time).order_by(calorie.time.desc()).limit(7)
-        #result = db.session.query(func.sum(calorie.vol), calorie.time).group_by(calorie.time).limit(7)
-        result = db.session.query(func.sum(calorie.vol), calorie.time, calorie.MEM_ID).filter_by(MEM_ID = args['MEM_ID']).group_by(calorie.time).order_by(calorie.time.desc()).all()
+        result = db.session.query(calorie.vol, calorie.time, calorie.MEM_ID).filter_by(MEM_ID = args['MEM_ID']).group_by(calorie.time).order_by(calorie.time.desc()).all()
+        #result = db.session.query(func.sum(calorie.vol), calorie.time, calorie.MEM_ID).filter_by(MEM_ID = args['MEM_ID']).group_by(calorie.time).order_by(calorie.time.desc()).all()
         return result
 
 class graph_7day_water(Resource):
     @marshal_with(Resource_field_water)
     def get(self):
         args = food_add_args.parse_args()
-        result = db.session.query(func.sum(water.WT_QUANTITY), water.WT_TIME, water.MEM_ID, water.WT_NO).filter_by(MEM_ID = args['MEM_ID']).group_by(water.WT_TIME).order_by(water.WT_TIME.desc()).all()
+        #result = db.session.query(func.sum(water.WT_QUANTITY), water.WT_TIME, water.MEM_ID, water.WT_NO).filter_by(MEM_ID = args['MEM_ID']).group_by(water.WT_TIME).order_by(water.WT_TIME.desc()).all()
+        result = db.session.query(water.WT_QUANTITY, water.WT_TIME, water.MEM_ID, water.WT_NO).filter_by(MEM_ID = args['MEM_ID']).group_by(water.WT_TIME).order_by(water.WT_TIME.desc()).all()
         return result
 
 class query_all_calorie(Resource):
@@ -437,8 +408,3 @@ api.add_resource(graph_7day_water, '/water_graph')
 # run_debug
 if __name__ == '__main__':
     app.run(debug = True, host ='0.0.0.0')
-
-"""
-    data -> {id : 1}
-    data.id -> 1
-"""
