@@ -238,10 +238,11 @@ class add_user(Resource):
 class login(Resource):
     def post(self):
         args = login_add_args.parse_args()
+        #username = args['username']
         password = args['password']
-        print(password)
+        #print(password)
         result = user.query.filter_by(username = args['username']).first()
-        print(result.password)
+        #print(result.password)
         if not result:
             abort(400, message = 'Wrong Username or Password')
         else:
