@@ -3,7 +3,6 @@ from flask import Flask
 from flask.scaffold import _matching_loader_thinks_module_is_package
 from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields
 from flask_sqlalchemy import SQLAlchemy
-import time
 
 # create Flask
 app = Flask(__name__)
@@ -403,7 +402,7 @@ class graph_7day(Resource):
 class query_all_calorie(Resource):
     @marshal_with(Resource_field_graph_cal)
     def get(self):
-        result = calorie.query.order_by(time).all()
+        result = calorie.query.order_by(calorie.time).all()
         return result
 
 # Call api
