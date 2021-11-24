@@ -229,14 +229,14 @@ class login(Resource):
         result = user.query.filter_by(username = args['username']).first()
         print(result)
         if not result:
-            abort(400, message = 'Wrong Username or Password')
+            return {"status" : 1, "msg" : "Your yusername or Password is Wrong"}
         else:
             if  result.password == password:
                 print(password, ' ', result.password)
-                msg = {"id" : result.MEM_ID}
+                msg = {"status" : 0, "id" : result.MEM_ID}
                 return msg, 200
             else:
-                abort(400, message = 'Wrong Username or Password')
+                return {"status" : 1, "msg" : "Your yusername or Password is Wrong"}
 
 # add weight
 class weight(Resource):
