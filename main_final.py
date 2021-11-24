@@ -1,9 +1,9 @@
 #flask
-import re
 from flask import Flask
 from flask.scaffold import _matching_loader_thinks_module_is_package
 from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields
 from flask_sqlalchemy import SQLAlchemy
+import time
 
 # create Flask
 app = Flask(__name__)
@@ -144,6 +144,13 @@ Resource_field_food = {
     'No' : fields.Integer,
     'Time' : fields.DateTime(dt_format='rfc822'),
     'Food' : fields.Integer,
+    'MEM_ID' : fields.Integer
+}
+
+Resource_field_graph_cal = {
+    'no' : fields.Integer,
+    'time' : fields.DateTime(dt_format='rfc822'),
+    'vol' : fields.Integer,
     'MEM_ID' : fields.Integer
 }
 
@@ -386,6 +393,19 @@ class foods(Resource):
         result = food.query.filter_by(MEM_ID = args['MEM_ID']).all()
         return result, 200
 
+class graph_7day(Resource):
+    @marshal_with(Resource_field_graph_cal)
+    def get(self):
+        args = food_add_args.parse_args()
+        result = calorie.query.filter_by(MEM_ID = args['MEM_ID']).order_by('').all()
+        return result
+
+class query_all_calorie(Resource):
+    @marshal_with(Resource_field_graph_cal)
+    def get(self):
+        result = calorie.query.order_by(time).all()
+        return result
+
 # Call api
 api.add_resource(Home, '/')
 api.add_resource(add_user, '/add_user')             # register
@@ -399,6 +419,8 @@ api.add_resource(calories, '/calories')             # get cal by id
 api.add_resource(foods, '/food')                    # get food by id
 api.add_resource(waters, '/water')                  # query all water
 api.add_resource(water_id, '/water_id')             # get waters by id
+api.add_resource(graph_7day, '/graph')
+api.add_resource(query_all_calorie, '/query_all_calorie')
 
 # run_debug
 if __name__ == '__main__':
