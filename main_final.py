@@ -5,7 +5,6 @@ from flask.scaffold import _matching_loader_thinks_module_is_package
 from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields
 from flask_sqlalchemy import SQLAlchemy
 
-from main import Resource_field_rerder, cal
 # create Flask
 app = Flask(__name__)
 
@@ -49,12 +48,6 @@ class water(db.Model):
     WT_TIME = db.Column(db.DateTime)
     WT_QUANTITY = db.Column(db.Integer)
     MEM_ID = db.Column(db.Integer, primary_key = True)
-
-class Status(db.Model):
-    __tablename__ = 'Status'
-    NO = db.Column(db.Integer, primary_key = True)
-    status = db.Column(db.Integer)
-    Time = db.Column(db.DateTime)
 
 class cal_rerder(db.Model):
     __tablename__ = 'cal_rerder'
@@ -406,7 +399,6 @@ api.add_resource(calories, '/calories')             # get cal by id
 api.add_resource(foods, '/food')                    # get food by id
 api.add_resource(waters, '/water')                  # query all water
 api.add_resource(water_id, '/water_id')             # get waters by id
-
 
 # run_debug
 if __name__ == '__main__':

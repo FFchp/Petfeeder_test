@@ -314,20 +314,20 @@ class water(Resource):
         print(type(result))
         return result, 200
 
-# call
-api.add_resource(Home, '/')     # home
-api.add_resource(User, '/user') # get all users
+# Call
+api.add_resource(Home, '/')                           # home ทำแล้ว
+api.add_resource(User, '/user')                       # get all user
 #api.add_resource(add_user, '/add_user/<string:username>/<string:password>/<string:email>')   # register
-api.add_resource(add_user, '/add_user')
-api.add_resource(get_user, '/login') #log in
+api.add_resource(add_user, '/add_user')               # Register ทำแล้ว
+api.add_resource(get_user, '/login')                  #log in ทำแล้ว
 api.add_resource(information, '/info/<string:topic>') # information
-api.add_resource(brand, '/brand/<string:name>')       # show brand
-api.add_resource(rerDer, '/rerder/<int:no>')          # rerDer
-api.add_resource(add_weight, '/add')                 #add weight
+api.add_resource(brand, '/brand/<string:name>')       # show brand ทำแล้ว
+api.add_resource(rerDer, '/rerder/<int:no>')          # rerDer ทำแล้ว
+api.add_resource(add_weight, '/add')                  #add weight ทำแล้ว
 api.add_resource(info_rerder, '/get_rerder')           # get all rer, der value
 api.add_resource(byid_rerder, '/byid_rerder/<int:id>') # get all rer, der by id 
 api.add_resource(cal, '/calories')                     # get cal  
-api.add_resource(water, '/water')                      # get water
+api.add_resource(water, '/water')                      # get water ทำแล้ว
 
 
 # run debug
