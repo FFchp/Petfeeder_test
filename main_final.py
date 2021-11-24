@@ -1,8 +1,8 @@
 #flask
 from flask import Flask
-from flask.scaffold import _matching_loader_thinks_module_is_package
 from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 
 # create Flask
 app = Flask(__name__)
@@ -44,7 +44,7 @@ class food_brand(db.Model):
 class water(db.Model):
     __tablename__ = 'water'
     WT_NO = db.Column(db.Integer, primary_key = True)
-    WT_TIME = db.Column(db.DateTime)
+    WT_TIME = db.Column(db.Date)
     WT_QUANTITY = db.Column(db.Integer)
     MEM_ID = db.Column(db.Integer, primary_key = True)
 
@@ -113,7 +113,7 @@ Resource_field_brand = {
 
 Resource_field_water = {
     'WT_NO' : fields.Integer,
-    'WT_TIME' : fields.DateTime(dt_format='rfc822'),
+    'WT_TIME' : fields.DateTime(dt_format='iso8601'),
     'WT_QUANTITY' : fields.Integer,
     'MEM_ID' : fields.Integer
 }
@@ -148,10 +148,11 @@ Resource_field_food = {
 
 Resource_field_graph_cal = {
     'no' : fields.Integer,
-    'time' : fields.DateTime(dt_format='rfc822'),
+    'time' : fields.DateTime(dt_format='iso8601'),
     'vol' : fields.Integer,
     'MEM_ID' : fields.Integer
 }
+
 
 # Request Parser
 #register
@@ -242,7 +243,7 @@ class login(Resource):
         result = user.query.filter_by(username = args['username']).first()
         print(result.password)
         if not result:
-            abort(404, message = 'Wrong Username or Password')
+            abort(400, message = 'Wrong Username or Password')
         else:
             if  result.password == password:
                 print(password, ' ', result.password)
@@ -396,7 +397,17 @@ class graph_7day(Resource):
     @marshal_with(Resource_field_graph_cal)
     def get(self):
         args = food_add_args.parse_args()
-        result = calorie.query.filter_by(MEM_ID = args['MEM_ID']).order_by('').all()
+        #SELECT SUM(vol), time from calorie group by DATE(time) ORDER BY time desc limit 5
+        #result = calorie.query.func.sum.calorie.vol.group_by(calorie.time).order_by(calorie.time.desc()).limit(7)
+        #result = db.session.query(func.sum(calorie.vol), calorie.time).group_by(calorie.time).limit(7)
+        result = db.session.query(func.sum(calorie.vol), calorie.time, calorie.MEM_ID).filter_by(MEM_ID = args['MEM_ID']).group_by(calorie.time).order_by(calorie.time.desc()).all()
+        return result
+
+class graph_7day_water(Resource):
+    @marshal_with(Resource_field_water)
+    def get(self):
+        args = food_add_args.parse_args()
+        result = db.session.query(func.sum(water.WT_QUANTITY), water.WT_TIME, water.MEM_ID, water.WT_NO).filter_by(MEM_ID = args['MEM_ID']).group_by(water.WT_TIME).order_by(water.WT_TIME.desc()).all()
         return result
 
 class query_all_calorie(Resource):
@@ -418,8 +429,9 @@ api.add_resource(calories, '/calories')             # get cal by id
 api.add_resource(foods, '/food')                    # get food by id
 api.add_resource(waters, '/water')                  # query all water
 api.add_resource(water_id, '/water_id')             # get waters by id
-api.add_resource(graph_7day, '/graph')
-api.add_resource(query_all_calorie, '/query_all_calorie')
+api.add_resource(graph_7day, '/graph')              # graph
+api.add_resource(query_all_calorie, '/query_all_calorie') # query all node-red
+api.add_resource(graph_7day_water, '/water_graph')
 
 # run_debug
 if __name__ == '__main__':
