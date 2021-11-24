@@ -242,7 +242,7 @@ class login(Resource):
         password = args['password']
         #print(password)
         result = user.query.filter_by(username = args['username']).first()
-        #print(result.password)
+        print(result)
         if not result:
             abort(400, message = 'Wrong Username or Password')
         else:
