@@ -154,12 +154,12 @@ Resource_field_graph_cal = {
 }
 
 Resource_field_only_vol = {
-    'no' : fields.Integer,
+    'No' : fields.Integer,
     'vol' : fields.Integer
 }
 
 # Request Parser
-#register
+# register
 user_add_args = reqparse.RequestParser()
 user_add_args.add_argument('username', type = str, required = True, help='กรุณาใส่ Username')
 user_add_args.add_argument('password', type = str, required = True, help='กรุณาใส่ Password')
@@ -399,7 +399,7 @@ class query_all_cal(Resource):
     @marshal_with(Resource_field_only_vol)
     def get(self):
         args = food_add_args.parse_args()
-        result = db.session.query(calorie.vol).filter_by(MEM_ID = args['MEM_ID']).order_by(calorie.No.desc()).all()
+        result = db.session.query(calorie.vol, calorie.No).filter_by(MEM_ID = args['MEM_ID']).order_by(calorie.No.desc()).all()
         return result
 
 # Call api
@@ -418,8 +418,7 @@ api.add_resource(water_id, '/water_id')                     # get waters by id
 api.add_resource(graph_7day, '/graph')                      # graph
 api.add_resource(query_all_calorie, '/query_all_calorie')   # query all node-red
 api.add_resource(graph_7day_water, '/water_graph')          # water_graph
-api.add_resource(query_all_cal, '/get_vol')                 # get only volumn                                          
-
+api.add_resource(query_all_cal, '/get_vol')                 # get only volumn
 
 # run_debug
 if __name__ == '__main__':
