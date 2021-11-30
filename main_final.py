@@ -2,6 +2,7 @@
 from flask import Flask
 from flask_restful import Api, Resource, abort, reqparse, marshal_with, fields
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 
 # create Flask
 app = Flask(__name__)
@@ -120,7 +121,7 @@ Resource_field_info = {
     'No' : fields.Integer,
     'topic' : fields.String,
     'info' : fields.String,
-    'time' : fields.DateTime(dt_format='rfc822')
+    'time' : fields.DateTime(dt_format='iso8601')
 }
 
 Resource_field_calrerder = {
@@ -133,14 +134,14 @@ Resource_field_calrerder = {
 
 Resource_field_calorie = {
     'no' : fields.Integer,
-    'time' : fields.DateTime(dt_format='rfc822'),
+    'time' : fields.DateTime(dt_format='iso8601'),
     'vol' : fields.Integer,
     'MEM_ID' : fields.Integer
 }
 
 Resource_field_food = {
     'No' : fields.Integer,
-    'Time' : fields.DateTime(dt_format='rfc822'),
+    'Time' : fields.DateTime(dt_format='iso8601'),
     'Food' : fields.Integer,
     'MEM_ID' : fields.Integer
 }
@@ -229,14 +230,14 @@ class login(Resource):
         result = user.query.filter_by(username = args['username']).first()
         print(result)
         if not result:
-            return {"status" : 1, "msg" : "Your yusername or Password is Wrong"}
+            return {"status" : 1, "msg" : "Your username or Password is Wrong"}
         else:
             if  result.password == password:
                 print(password, ' ', result.password)
                 msg = {"status" : 0, "id" : result.MEM_ID}
                 return msg, 200
             else:
-                return {"status" : 1, "msg" : "Your yusername or Password is Wrong"}
+                return {"status" : 1, "msg" : "Your username or Password is Wrong"}
 
 # add weight
 class weight(Resource):
@@ -379,7 +380,8 @@ class graph_7day_water(Resource):
     def get(self):
         args = food_add_args.parse_args()
         #result = db.session.query(func.sum(water.WT_QUANTITY), water.WT_TIME, water.MEM_ID, water.WT_NO).filter_by(MEM_ID = args['MEM_ID']).group_by(water.WT_TIME).order_by(water.WT_TIME.desc()).all()
-        result = db.session.query(water.WT_QUANTITY, water.WT_TIME, water.MEM_ID, water.WT_NO).filter_by(MEM_ID = args['MEM_ID']).group_by(water.WT_TIME).order_by(water.WT_TIME.desc()).all()
+        #result = db.session.query(sum(water.WT_QUANTITY), water.WT_TIME, water.MEM_ID, water.WT_NO).filter_by(MEM_ID = args['MEM_ID']).group_by(water.WT_TIME).order_by(water.WT_TIME.desc()).all()
+        result = db.session.query(water.WT_QUANTITY, water.WT_TIME, water.MEM_ID, water.WT_NO).filter_by(MEM_ID = args['MEM_ID']).order_by(water.WT_TIME.desc()).all()
         return result
 
 class query_all_calorie(Resource):
@@ -403,7 +405,7 @@ api.add_resource(waters, '/water')                  # query all water
 api.add_resource(water_id, '/water_id')             # get waters by id
 api.add_resource(graph_7day, '/graph')              # graph
 api.add_resource(query_all_calorie, '/query_all_calorie') # query all node-red
-api.add_resource(graph_7day_water, '/water_graph')
+api.add_resource(graph_7day_water, '/water_graph')  # water_graph
 
 # run_debug
 if __name__ == '__main__':
