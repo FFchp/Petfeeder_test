@@ -153,6 +153,11 @@ Resource_field_graph_cal = {
     'MEM_ID' : fields.Integer
 }
 
+Resource_field_only_vol = {
+    'no' : fields.Integer,
+    'vol' : fields.Integer
+}
+
 # Request Parser
 #register
 user_add_args = reqparse.RequestParser()
@@ -390,22 +395,31 @@ class query_all_calorie(Resource):
         result = calorie.query.order_by(calorie.time).all()
         return result
 
+class query_all_cal(Resource):
+    @marshal_with(Resource_field_only_vol)
+    def get(self):
+        args = food_add_args.parse_args()
+        result = db.session.query(calorie.vol).filter_by(MEM_ID = args['MEM_ID']).order_by(calorie.No.desc()).all()
+        return result
+
 # Call api
 api.add_resource(Home, '/')
-api.add_resource(add_user, '/add_user')             # register
-api.add_resource(login, '/login')                   # login
-api.add_resource(brand, '/brand')                   # food_brand
-api.add_resource(informations, '/information')      # get information
-api.add_resource(Calculate, '/calculate')           # calulate
-api.add_resource(weight, '/add_weight')             # add dog personal info
-api.add_resource(get_rer_byid, '/rer_byid')         # get rer der by id
-api.add_resource(calories, '/calories')             # get cal by id
-api.add_resource(foods, '/food')                    # get food by id
-api.add_resource(waters, '/water')                  # query all water
-api.add_resource(water_id, '/water_id')             # get waters by id
-api.add_resource(graph_7day, '/graph')              # graph
-api.add_resource(query_all_calorie, '/query_all_calorie') # query all node-red
-api.add_resource(graph_7day_water, '/water_graph')  # water_graph
+api.add_resource(add_user, '/add_user')                     # register
+api.add_resource(login, '/login')                           # login
+api.add_resource(brand, '/brand')                           # food_brand
+api.add_resource(informations, '/information')              # get information
+api.add_resource(Calculate, '/calculate')                   # calulate
+api.add_resource(weight, '/add_weight')                     # add dog personal info
+api.add_resource(get_rer_byid, '/rer_byid')                 # get rer der by id
+api.add_resource(calories, '/calories')                     # get cal by id
+api.add_resource(foods, '/food')                            # get food by id
+api.add_resource(waters, '/water')                          # query all water
+api.add_resource(water_id, '/water_id')                     # get waters by id
+api.add_resource(graph_7day, '/graph')                      # graph
+api.add_resource(query_all_calorie, '/query_all_calorie')   # query all node-red
+api.add_resource(graph_7day_water, '/water_graph')          # water_graph
+api.add_resource(query_all_cal, '/get_vol')                 # get only volumn                                          
+
 
 # run_debug
 if __name__ == '__main__':
