@@ -238,7 +238,7 @@ class login(Resource):
             return {"status" : 1, "msg" : "Your username or Password is Correct"}
         else:
             if  result.password == password:
-                print(password, ' ', result.password)
+                #print(password, ' ', result.password)
                 msg = {"status" : 0, "id" : result.MEM_ID}
                 return msg, 200
             else:
