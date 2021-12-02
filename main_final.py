@@ -235,7 +235,7 @@ class login(Resource):
         result = user.query.filter_by(username = args['username']).first()
         print(result)
         if not result:
-            return {"status" : 1, "msg" : "Your username or Password is Wrong"}
+            return {"status" : 1, "msg" : "Your username or Password is Correct"}
         else:
             if  result.password == password:
                 print(password, ' ', result.password)
