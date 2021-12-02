@@ -43,9 +43,9 @@ class food_brand(db.Model):
 
 class water(db.Model):
     __tablename__ = 'water'
-    WT_NO = db.Column(db.Integer, primary_key = True)
-    WT_TIME = db.Column(db.Date)
-    WT_QUANTITY = db.Column(db.Integer)
+    wt_no = db.Column(db.Integer, primary_key = True)
+    wt_time = db.Column(db.Date)
+    wt_quanitity = db.Column(db.Integer)
     MEM_ID = db.Column(db.Integer, primary_key = True)
 
 class cal_rerder(db.Model):
@@ -112,9 +112,9 @@ Resource_field_brand = {
 }
 
 Resource_field_water = {
-    'WT_NO' : fields.Integer,
-    'WT_TIME' : fields.DateTime(dt_format='iso8601'),
-    'WT_QUANTITY' : fields.Integer,
+    'wt_no' : fields.Integer,
+    'wt_time' : fields.DateTime(dt_format='iso8601'),
+    'wt_quanitity' : fields.Integer,
     'MEM_ID' : fields.Integer
 }
 Resource_field_info = {
