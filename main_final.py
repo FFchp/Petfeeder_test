@@ -384,10 +384,10 @@ class graph_7day_water(Resource):
     @marshal_with(Resource_field_water)
     def get(self):
         args = food_add_args.parse_args()
-        result = db.session.query(func.sum(water.wt_quanitity), water.wt_time, water.MEM_ID, water.wt_no).filter_by(MEM_ID = args['MEM_ID']).group_by(water.wt_time).order_by(water.wt_time.desc()).all()
+        #result = db.session.query(func.sum(water.wt_quanitity), water.wt_time, water.MEM_ID, water.wt_no).filter_by(MEM_ID = args['MEM_ID']).group_by(water.wt_time).order_by(water.wt_time.desc()).all()
         #result = db.session('SELECT SUM(vol), time from calorie group by DATE(time) ORDER BY time desc limit 5')
         #result = db.session.query(sum(water.WT_QUANTITY), water.WT_TIME, water.MEM_ID, water.WT_NO).filter_by(MEM_ID = args['MEM_ID']).group_by(water.WT_TIME).order_by(water.WT_TIME.desc()).all()
-        #result = db.session.query(water.WT_QUANTITY, water.WT_TIME, water.MEM_ID, water.WT_NO).filter_by(MEM_ID = args['MEM_ID']).order_by(water.WT_TIME.desc()).all()
+        result = db.session.query(water.wt_quanitity, water.wt_time, water.MEM_ID, water.wt_no).filter_by(MEM_ID = args['MEM_ID']).order_by(water.wt_time.desc()).all()
         return result
 
 class query_all_calorie(Resource):
